@@ -1,0 +1,12 @@
+{
+  "name": "aws-quiz-app",
+  "version": "1.0.0",
+  "description": "A scalable quiz application for AWS practice exams",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+} 
