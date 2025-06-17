@@ -360,7 +360,7 @@ class QuizApp {
         this.submitButton.style.display = 'none';
         this.nextButton.style.display = 'none';
         this.fileUpload.value = '';
-        this.titleElement.textContent = 'AWS Quiz App';
+        this.titleElement.textContent = 'QuizMinD';
         this.updateFileHistory();
     }
 

@@ -1,7 +1,7 @@
 {
-  "name": "aws-quiz-app",
+  "name": "quizmind",
   "version": "1.0.0",
-  "description": "A scalable quiz application for AWS practice exams",
+  "description": "A smart and intuitive quiz application for practice exams",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

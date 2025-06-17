@@ -1,4 +1,4 @@
-# MD-Quizzer
+# QuizMinD
 
 A scalable quiz application for AWS practice exams, built with Node.js and Express. This application allows you to create and manage quizzes in Markdown format, making it easy to maintain and update your study materials.
 
@@ -22,8 +22,8 @@ A scalable quiz application for AWS practice exams, built with Node.js and Expre
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/MD-Quizzer.git
-   cd MD-Quizzer
+   git clone https://github.com/yourusername/QuizMinD.git
+   cd QuizMinD
    ```
 
 2. Start the application using Docker Compose:
@@ -43,8 +43,8 @@ A scalable quiz application for AWS practice exams, built with Node.js and Expre
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/MD-Quizzer.git
-   cd MD-Quizzer
+   git clone https://github.com/yourusername/QuizMinD.git
+   cd QuizMinD
    ```
 
 2. Install dependencies:
@@ -66,7 +66,7 @@ A scalable quiz application for AWS practice exams, built with Node.js and Expre
 ## Project Structure
 
 ```
-MD-Quizzer/
+QuizMinD/
 ├── public/          # Static files
 ├── server.js        # Main application server
 ├── Dockerfile       # Docker configuration

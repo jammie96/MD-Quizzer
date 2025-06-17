@@ -8,6 +8,13 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    container_name: quizmind-quiz-app
     environment:
       - NODE_ENV=development
-    restart: unless-stopped 
+    restart: unless-stopped
+    networks:
+      - quizmind-network
+
+networks:
+  quizmind-network:
+    name: quizmind_default 
