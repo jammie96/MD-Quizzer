@@ -5,6 +5,9 @@ class QuizApp {
         this.score = 0;
         this.selectedAnswers = new Set();
         this.quizFile = null;
+        this.isQuizStarted = false;
+        this.uploadedFiles = new Map(); // Store uploaded files with their names
+        this.isLoading = false;
         
 
         // DOM Elements
@@ -13,12 +16,49 @@ class QuizApp {
         this.submitButton = document.getElementById('submit-btn');
         this.nextButton = document.getElementById('next-btn');
         this.scoreElement = document.getElementById('score');
-        this.fileSelector = document.getElementById('quiz-file-selector');
+        this.fileUpload = document.getElementById('quiz-file-upload');
+        this.fileUploadContainer = document.querySelector('.file-upload');
+        this.titleElement = document.querySelector('h1');
+
+        // Create loading overlay
+        this.loadingOverlay = document.createElement('div');
+        this.loadingOverlay.className = 'loading-overlay';
+        this.loadingOverlay.style.display = 'none';
+        this.loadingOverlay.innerHTML = `
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading Quiz...</p>
+        `;
+        document.body.appendChild(this.loadingOverlay);
+
+        // Create main menu button
+        this.mainMenuButton = document.createElement('button');
+        this.mainMenuButton.id = 'main-menu-btn';
+        this.mainMenuButton.textContent = 'Main Menu';
+        this.mainMenuButton.style.display = 'none';
+        this.mainMenuButton.addEventListener('click', () => this.returnToMainMenu());
+        document.querySelector('.container').insertBefore(this.mainMenuButton, document.querySelector('.container').firstChild);
+
+        // Create file history dropdown
+        this.fileHistoryContainer = document.createElement('div');
+        this.fileHistoryContainer.className = 'file-history';
+        this.fileHistoryContainer.style.display = 'none';
+        
+        // Create welcome text
+        this.welcomeText = document.createElement('p');
+        this.welcomeText.className = 'welcome-text';
+        this.welcomeText.textContent = 'Select a quiz file to begin';
+        this.fileHistoryContainer.appendChild(this.welcomeText);
+
+        this.fileHistorySelect = document.createElement('select');
+        this.fileHistorySelect.id = 'file-history-select';
+        this.fileHistorySelect.addEventListener('change', (e) => this.loadFromHistory(e.target.value));
+        this.fileHistoryContainer.appendChild(this.fileHistorySelect);
+        this.fileUploadContainer.appendChild(this.fileHistoryContainer);
 
         // Event Listeners
         this.submitButton.addEventListener('click', () => this.checkAnswer());
         this.nextButton.addEventListener('click', () => this.nextQuestion());
-        this.fileSelector.addEventListener('change', (e) => this.loadQuizFile(e.target.value));
+        this.fileUpload.addEventListener('change', (e) => this.handleFileUpload(e));
 
         // Hide buttons initially
         this.submitButton.style.display = 'none';
@@ -46,20 +86,39 @@ class QuizApp {
         }
     }
 
-    async loadQuizFile(filename) {
-        if (!filename) return;
+    setLoading(isLoading) {
+        this.isLoading = isLoading;
+        document.body.style.cursor = isLoading ? 'wait' : 'default';
+        if (this.loadingOverlay) {
+            this.loadingOverlay.style.display = isLoading ? 'flex' : 'none';
+        }
+    }
+
+    async handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
         try {
-            const response = await fetch(`/api/quiz/${filename}`);
-            const content = await response.text();
-            this.questions = this.parseMarkdownQuiz(content);
-            this.currentQuestionIndex = 0;
-            this.score = 0;
-            this.updateScore();
-            this.displayQuestion();
+            this.setLoading(true);
+            const content = await this.readFileContent(file);
+            this.uploadedFiles.set(file.name, content);
+            this.updateFileHistory();
+            await this.startQuiz(content, file.name);
         } catch (error) {
-            console.error('Error loading quiz file:', error);
+            console.error('Error reading file:', error);
+            alert('Error reading the quiz file. Please make sure it\'s a valid quiz file.');
+        } finally {
+            this.setLoading(false);
         }
+    }
+
+    readFileContent(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsText(file);
+        });
     }
 
     parseMarkdownQuiz(content) {
@@ -277,20 +336,76 @@ class QuizApp {
     resetQuiz() {
         this.currentQuestionIndex = 0;
         this.score = 0;
+        this.isQuizStarted = true;
+        this.fileUploadContainer.style.display = 'none';
+        this.mainMenuButton.style.display = 'block';
         this.updateScore();
         this.displayQuestion();
     }
 
     chooseNewQuiz() {
-        this.fileSelector.value = '';
+        this.returnToMainMenu();
+    }
+
+    returnToMainMenu() {
         this.questions = [];
         this.currentQuestionIndex = 0;
         this.score = 0;
+        this.isQuizStarted = false;
+        this.fileUploadContainer.style.display = 'block';
+        this.mainMenuButton.style.display = 'none';
         this.updateScore();
-        this.questionElement.textContent = 'Select a quiz file to begin';
+        this.questionElement.textContent = '';
         this.optionsContainer.innerHTML = '';
         this.submitButton.style.display = 'none';
         this.nextButton.style.display = 'none';
+        this.fileUpload.value = '';
+        this.titleElement.textContent = 'AWS Quiz App';
+        this.updateFileHistory();
+    }
+
+    async startQuiz(content, filename) {
+        try {
+            this.questions = this.parseMarkdownQuiz(content);
+            this.currentQuestionIndex = 0;
+            this.score = 0;
+            this.updateScore();
+            this.isQuizStarted = true;
+            this.fileUploadContainer.style.display = 'none';
+            this.mainMenuButton.style.display = 'block';
+            this.titleElement.textContent = filename.replace('.md', '');
+            this.displayQuestion();
+        } catch (error) {
+            console.error('Error starting quiz:', error);
+            throw error;
+        }
+    }
+
+    async loadFromHistory(filename) {
+        if (!filename) return;
+        const content = this.uploadedFiles.get(filename);
+        if (content) {
+            this.setLoading(true);
+            try {
+                await this.startQuiz(content, filename);
+            } catch (error) {
+                console.error('Error loading quiz from history:', error);
+                alert('Error loading the quiz. Please try again.');
+            } finally {
+                this.setLoading(false);
+            }
+        }
+    }
+
+    updateFileHistory() {
+        this.fileHistorySelect.innerHTML = '<option value="">Select a previous quiz</option>';
+        this.uploadedFiles.forEach((content, filename) => {
+            const option = document.createElement('option');
+            option.value = filename;
+            option.textContent = filename.replace('.md', '');
+            this.fileHistorySelect.appendChild(option);
+        });
+        this.fileHistoryContainer.style.display = this.uploadedFiles.size > 0 ? 'block' : 'none';
     }
 }
 

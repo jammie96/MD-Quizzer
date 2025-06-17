@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWS Quiz App</title>
+    <title>MD-Quizzer</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>AWS Quiz App</h1>
-        <div class="file-selector">
-            <select id="quiz-file-selector">
-                <option value="">Select a Quiz File</option>
-            </select>
+        <h1>MD-Quizzer</h1>
+        <div class="file-upload">
+            <input type="file" id="quiz-file-upload" accept=".md,.txt" />
+            <label for="quiz-file-upload" class="upload-btn">Choose Quiz File</label>
         </div>
         <div id="quiz-container">
             <div id="question-container">
