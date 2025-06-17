@@ -22,7 +22,7 @@ A scalable quiz application for AWS practice exams, built with Node.js and Expre
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/QuizMinD.git
+   git clone [https://github.com/jammie96/QuizMinD.git](https://github.com/jammie96/QuizMinD.git)
    cd QuizMinD
    ```
 
@@ -43,7 +43,7 @@ A scalable quiz application for AWS practice exams, built with Node.js and Expre
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/QuizMinD.git
+   git clone [https://github.com/jammie96/QuizMinD.git](https://github.com/jammie96/QuizMinD.git)
    cd QuizMinD
    ```
 
